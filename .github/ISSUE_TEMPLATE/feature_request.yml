@@ -1,0 +1,57 @@
+name: "✨ Nueva Funcionalidad"
+description: "Proponer una nueva funcionalidad o mejora"
+title: "[FEAT]: "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por proponer una nueva idea!
+        Describe tu propuesta lo más claro posible.
+
+  - type: textarea
+    id: problema
+    attributes:
+      label: Problema o Necesidad
+      description: ¿Qué problema resuelve esta funcionalidad?
+      placeholder: "Como usuario, necesito..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: solucion
+    attributes:
+      label: Solución Propuesta
+      description: Describe cómo te gustaría que funcionara
+      placeholder: "Me gustaría que al hacer X, ocurra Y..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternativas
+    attributes:
+      label: Alternativas Consideradas
+      description: ¿Has considerado otras formas de resolver esto?
+      placeholder: "Otra opción sería..."
+    validations:
+      required: false
+
+  - type: dropdown
+    id: prioridad
+    attributes:
+      label: Prioridad Sugerida
+      options:
+        - Baja - Nice to have
+        - Media - Mejora la experiencia
+        - Alta - Importante para el proyecto
+        - Crítica - Bloquea funcionalidades
+    validations:
+      required: true
+
+  - type: textarea
+    id: contexto
+    attributes:
+      label: Contexto Adicional
+      description: Mockups, referencias, ejemplos...
+    validations:
+      required: false
