@@ -41,13 +41,3 @@ Los videos de demostración están disponibles en:
 | Jitter GPS (parpadeo del objeto) | Congelado de posición tras 5s de estabilización |
 | Efecto billboard                 | Eliminación del atributo `look-at`              |
 | Librerías obsoletas              | Migración a `@ar-js-org/AR.js`                  |
-
-## Requisitos
-
-- Dispositivo móvil con GPS y cámara
-- Conexión HTTPS (requisito de la API de geolocalización)
-- Permisos de cámara y ubicación
-
-## Autor
-
-Daniel - [DareMapp](https://github.com/daremappdaniel-dev)
