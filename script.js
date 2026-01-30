@@ -13,7 +13,7 @@ function staticLoadPlaces() {
         latitude: 40.65574412076483,
         longitude: -4.699638143293775,
         model: "./assets/daremapp/daremapp_logo.glb",
-        scale: "25 25 25",
+        scale: "5 5 5",
         rotation: "0 0 0"
     };
 
