@@ -9,8 +9,9 @@ window.onload = function() {
 function staticLoadPlaces() {
     const place = {
         name: "DareMapp Logo",
-        latitude: 40.65335112353184,
-        longitude: -4.699466481923554,
+        // oficina
+        latitude: 40.65574412076483,
+        longitude: -4.699638143293775,
         model: "./assets/daremapp/daremapp_logo.glb",
         scale: "50 50 50",
         rotation: "0 0 0"
