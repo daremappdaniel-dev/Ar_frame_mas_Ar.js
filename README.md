@@ -11,23 +11,22 @@ MIT License Mozilla, ahora Supermedium.
 AR.js: MIT License Código abierto.
 
 3.Comunidad:
-ar frame, comunidad muy muy activa
-ar.js está muerta
+Ar frame, comunidad muy muy activa.
+Ar.js ultima release en 2025, nuevas versiones ar.js-next y ar.LocAR.
 
 4.Actualizaciones:
-ar.frame muchas
-ar.js migro a LorAR
+Ar.frame muchas.
+Ar.js migro a LorAR y Ar.js-next.
 
 5.Dependencias Angular:
-No tiene
+No tiene.
 
 6.¿Qué aporta?
 3d real,ubicación real, libreria para la ubicación.
 
 7.Problemas:
-Jitter GPS 
-Efecto billboard
-Librerías obsoletas
+Jitter GPS.
+Efecto billboard.
 
 7.Ejemplos reales:
 Experiencias cortas educativas, debido a los problemas. Solo web casi nada de móvil.
