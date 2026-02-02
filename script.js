@@ -1,9 +1,3 @@
-/*
- * script.js
- * Implements 'gps-new-entity-place' with Haversine distance calculation and limits jitter.
- */
-
-// Hack to override the existing component if it exists
 delete AFRAME.components['gps-new-entity-place'];
 
 AFRAME.registerComponent("gps-new-entity-place", {
@@ -19,21 +13,21 @@ AFRAME.registerComponent("gps-new-entity-place", {
     },
 
     init: function () {
-        console.log("📍 [Haversine] Component initialized");
+        console.log("Haversine Component initialized");
         const camera = document.querySelector("[gps-new-camera]");
         if (!camera.components["gps-new-camera"]) {
-            console.error("❌ gps-new-camera not initialised");
+            console.error("gps-new-camera not initialised");
             return;
         }
         this._cameraGps = camera.components["gps-new-camera"];
 
         camera.addEventListener("gps-camera-update-position", (e) => {
             if (e.detail && e.detail.position) {
-                console.log("📡 [GPS Update] Pos:", e.detail.position);
+                const { latitude, longitude, accuracy } = e.detail.position;
+                console.log(`GPS Lat: ${latitude.toFixed(6)} Lon: ${longitude.toFixed(6)} Acc: ${accuracy || '?'}m`);
                 this.distance = this._haversineDist(e.detail.position, this.data);
-                console.log("📏 [Distance] Calculated:", this.distance + "m");
+                console.log(`Distancia Objetivo a: ${this.distance.toFixed(2)} metros`);
                 
-                // CRITICAL FIX: Update 3D position based on new camera location
                 if (this._cameraGps && this._cameraGps.threeLoc) {
                      const projCoords = this._cameraGps.threeLoc.lonLatToWorldCoords(
                         this.data.longitude,
@@ -95,8 +89,8 @@ window.onload = function () {
 function staticLoadPlaces() {
     const place = {
         name: "DareMapp Logo",
-        latitude: 40.9949328,
-        longitude: -5.7195758,
+        latitude: 40.65416079190461,
+        longitude: -4.696458373056158,
         model: "./assets/daremapp/daremapp_logo.glb",
         scale: "15 15 15",
         rotation: "0 0 0"
