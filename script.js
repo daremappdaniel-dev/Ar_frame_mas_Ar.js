@@ -1,82 +1,111 @@
-delete AFRAME.components['gps-new-entity-place'];
 
-AFRAME.registerComponent("gps-new-entity-place", {
-    schema: {
-        longitude: {
-            type: "number",
-            default: 0,
-        },
-        latitude: {
-            type: "number",
-            default: 0,
-        },
+AFRAME.registerComponent("gps-projected-entity-place", {
+  _cameraGps: null,
+  schema: {
+    longitude: {
+      type: "number",
+      default: 0,
     },
-
-    init: function () {
-        console.log("Haversine Component initialized");
-        const camera = document.querySelector("[gps-new-camera]");
-        if (!camera.components["gps-new-camera"]) {
-            console.error("gps-new-camera not initialised");
-            return;
+    latitude: {
+      type: "number",
+      default: 0,
+    },
+  },
+  remove: function () {
+    window.removeEventListener(
+      "gps-camera-update-position",
+      this.updatePositionListener,
+    );
+  },
+  init: function () {
+    this.coordSetListener = () => {
+      if (!this._cameraGps) {
+        var camera = document.querySelector("[gps-projected-camera]");
+        if (!camera.components["gps-projected-camera"]) {
+          console.error("gps-projected-camera not initialized");
+          return;
         }
-        this._cameraGps = camera.components["gps-new-camera"];
+        this._cameraGps = camera.components["gps-projected-camera"];
+        this._updatePosition();
+      }
+    };
 
-        camera.addEventListener("gps-camera-update-position", (e) => {
-            if (e.detail && e.detail.position) {
-                const { latitude, longitude, accuracy } = e.detail.position;
-                console.log(`GPS Lat: ${latitude.toFixed(6)} Lon: ${longitude.toFixed(6)} Acc: ${accuracy || '?'}m`);
-                this.distance = this._haversineDist(e.detail.position, this.data);
-                console.log(`Distancia Objetivo a: ${this.distance.toFixed(2)} metros`);
-                
-                if (this._cameraGps && this._cameraGps.threeLoc) {
-                     const projCoords = this._cameraGps.threeLoc.lonLatToWorldCoords(
-                        this.data.longitude,
-                        this.data.latitude
-                    );
-                    this.el.object3D.position.set(
-                        projCoords[0],
-                        this.el.object3D.position.y,
-                        projCoords[1]
-                    );
-                }
-            }
-        });
+    this.updatePositionListener = (ev) => {
+      if (!this.data || !this._cameraGps) {
+        return;
+      }
 
-        this.el.sceneEl.emit("gps-entity-place-added", {
-            component: this.el,
-        });
-    },
+      var dstCoords = this.el.getAttribute("position");
+      var distanceForMsg = this._cameraGps.computeDistanceMeters(dstCoords);
 
-    update: function () {
-        if (this._cameraGps && this._cameraGps.threeLoc) {
-            const projCoords = this._cameraGps.threeLoc.lonLatToWorldCoords(
-                this.data.longitude,
-                this.data.latitude
-            );
-            this.el.object3D.position.set(
-                projCoords[0],
-                this.el.object3D.position.y,
-                projCoords[1]
-            );
-        }
-    },
+      this.el.setAttribute("distance", distanceForMsg);
+      this.el.setAttribute("distanceMsg", this._formatDistance(distanceForMsg));
 
-    setDistanceFrom: function (position) {
-        this.distance = this._haversineDist(position, this.data);
-    },
+      this.el.dispatchEvent(
+        new CustomEvent("gps-entity-place-update-position", {
+          detail: { distance: distanceForMsg },
+        }),
+      );
 
-    _haversineDist: function (src, dest) {
-        const dlongitude = THREE.MathUtils.degToRad(dest.longitude - src.longitude);
-        const dlatitude = THREE.MathUtils.degToRad(dest.latitude - src.latitude);
+      var actualDistance = this._cameraGps.computeDistanceMeters(
+        dstCoords,
+        true,
+      );
 
-        const a =
-            Math.sin(dlatitude / 2) * Math.sin(dlatitude / 2) +
-            Math.cos(THREE.MathUtils.degToRad(src.latitude)) *
-            Math.cos(THREE.MathUtils.degToRad(dest.latitude)) *
-            (Math.sin(dlongitude / 2) * Math.sin(dlongitude / 2));
-        const angle = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return angle * 6371000;
-    },
+      if (actualDistance === Number.MAX_SAFE_INTEGER) {
+        this.hideForMinDistance(this.el, true);
+      } else {
+        this.hideForMinDistance(this.el, false);
+      }
+    };
+
+    window.addEventListener(
+      "gps-camera-origin-coord-set",
+      this.coordSetListener,
+    );
+    window.addEventListener(
+      "gps-camera-update-position",
+      this.updatePositionListener,
+    );
+
+    this._positionXDebug = 0;
+
+    window.dispatchEvent(
+      new CustomEvent("gps-entity-place-added", {
+        detail: { component: this.el },
+      }),
+    );
+  },
+
+  hideForMinDistance: function (el, hideEntity) {
+    if (hideEntity) {
+      el.setAttribute("visible", "false");
+    } else {
+      el.setAttribute("visible", "true");
+    }
+  },
+
+  _updatePosition: function () {
+    var worldPos = this._cameraGps.latLonToWorld(
+      this.data.latitude,
+      this.data.longitude,
+    );
+    var position = this.el.getAttribute("position");
+
+    this.el.setAttribute("position", {
+      x: worldPos[0],
+      y: position.y,
+      z: worldPos[1],
+    });
+  },
+
+  _formatDistance: function (distance) {
+    distance = distance.toFixed(0);
+    if (distance >= 1000) {
+      return distance / 1000 + " kilometers";
+    }
+    return distance + " meters";
+  },
 });
 
 window.onload = function () {
@@ -102,14 +131,14 @@ function staticLoadPlaces() {
     entity.setAttribute('id', 'daremapp-logo');
     entity.setAttribute('gltf-model', place.model);
 
-    entity.setAttribute('gps-new-entity-place', {
+    entity.setAttribute('gps-projected-entity-place', {
         latitude: place.latitude,
         longitude: place.longitude
     });
 
     entity.setAttribute('scale', place.scale);
     entity.setAttribute('rotation', place.rotation);
-    entity.setAttribute('look-at', '[gps-new-camera]'); 
+    entity.setAttribute('look-at', '[gps-projected-camera]'); 
 
     scene.appendChild(entity);
 }
