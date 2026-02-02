@@ -19,16 +19,19 @@ AFRAME.registerComponent("gps-new-entity-place", {
     },
 
     init: function () {
+        console.log("📍 [Haversine] Component initialized");
         const camera = document.querySelector("[gps-new-camera]");
         if (!camera.components["gps-new-camera"]) {
-            console.error("gps-new-camera not initialised");
+            console.error("❌ gps-new-camera not initialised");
             return;
         }
         this._cameraGps = camera.components["gps-new-camera"];
 
         camera.addEventListener("gps-camera-update-position", (e) => {
             if (e.detail && e.detail.position) {
+                console.log("📡 [GPS Update] Pos:", e.detail.position);
                 this.distance = this._haversineDist(e.detail.position, this.data);
+                console.log("📏 [Distance] Calculated:", this.distance + "m");
             }
         });
 
