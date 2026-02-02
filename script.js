@@ -32,6 +32,19 @@ AFRAME.registerComponent("gps-new-entity-place", {
                 console.log("📡 [GPS Update] Pos:", e.detail.position);
                 this.distance = this._haversineDist(e.detail.position, this.data);
                 console.log("📏 [Distance] Calculated:", this.distance + "m");
+                
+                // CRITICAL FIX: Update 3D position based on new camera location
+                if (this._cameraGps && this._cameraGps.threeLoc) {
+                     const projCoords = this._cameraGps.threeLoc.lonLatToWorldCoords(
+                        this.data.longitude,
+                        this.data.latitude
+                    );
+                    this.el.object3D.position.set(
+                        projCoords[0],
+                        this.el.object3D.position.y,
+                        projCoords[1]
+                    );
+                }
             }
         });
 
