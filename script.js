@@ -3,6 +3,9 @@
  * Implements 'gps-new-entity-place' with Haversine distance calculation and limits jitter.
  */
 
+// Hack to override the existing component if it exists
+delete AFRAME.components['gps-new-entity-place'];
+
 AFRAME.registerComponent("gps-new-entity-place", {
     schema: {
         longitude: {
