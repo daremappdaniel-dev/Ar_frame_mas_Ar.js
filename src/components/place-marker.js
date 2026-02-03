@@ -19,14 +19,22 @@ AFRAME.registerSystem('place-marker', {
     tick: function () {
         if (!this.cameraEl) return;
         const camPos = this.cameraEl.object3D.position;
+        const debugText = document.getElementById('debug-text');
 
         this.markers.forEach(marker => {
             const dist = marker.el.object3D.position.distanceTo(camPos);
-            if (dist < 15) {
+
+            if (debugText) {
+                debugText.setAttribute('value', `Dist: ${dist.toFixed(2)}m\nCam: ${camPos.x.toFixed(1)}, ${camPos.z.toFixed(1)}`);
+            }
+
+            if (dist < 1000) {
                 marker.onNear();
             } else {
                 marker.onFar();
             }
+
+            marker.el.object3D.lookAt(camPos);
         });
     }
 });
@@ -55,11 +63,7 @@ AFRAME.registerComponent('place-marker', {
 
         el.setAttribute('look-at', '[camera]');
 
-        const debugCube = document.createElement('a-entity');
-        debugCube.setAttribute('geometry', 'primitive: box; width: 0.5; height: 0.5; depth: 0.5');
-        debugCube.setAttribute('material', 'color: red');
-        debugCube.setAttribute('position', '0 1 0');
-        el.appendChild(debugCube);
+        el.object3D.position.y = 1.6;
 
         this.system.registerMarker(this);
     },
@@ -67,7 +71,7 @@ AFRAME.registerComponent('place-marker', {
     onNear: function () {
         if (!this.isNear) {
             console.log(`¡Cerca de ${this.data.name}!`);
-            this.el.setAttribute('scale', '20 20 20');
+            this.el.setAttribute('scale', '15 15 15');
             this.isNear = true;
         }
     },
