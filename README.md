@@ -1,0 +1,40 @@
+# AR.frame y Ar.js MVP
+
+Prototipo de navegación con Realidad Aumentada usando Ar.frame y Ar.js.
+
+1.URL oficial:
+https://aframe.io/
+https://ar-js-org.github.io/AR.js-Docs/
+
+2.Licencia:
+MIT License Mozilla, ahora Supermedium.
+AR.js: MIT License Código abierto.
+
+3.Comunidad:
+ar frame, comunidad muy muy activa
+ar.js está muerta
+
+4.Actualizaciones:
+ar.frame muchas
+ar.js migro a LorAR
+
+5.Dependencias Angular:
+No tiene
+
+6.¿Qué aporta?
+3d real,ubicación real, libreria para la ubicación.
+
+7.Problemas:
+Jitter GPS 
+Efecto billboard
+Librerías obsoletas
+
+7.Ejemplos reales:
+Experiencias cortas educativas, debido a los problemas. Solo web casi nada de móvil.
+
+## Demos
+Los videos de demostración están disponibles en:
+
+- [Demo 1 - Prueba inicial](assets/daremapp/videos/Screenrecorder-2026-01-29-12-38-43-914.mp4)
+- [Demo 2 - Versión estabilizada](assets/daremapp/videos/Screenrecorder-2026-01-29-12-50-33-732.mp4)
+
