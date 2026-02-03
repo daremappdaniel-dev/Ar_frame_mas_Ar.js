@@ -1,1 +1,4 @@
-Ar.js_example.code-workspace
+node_modules/
+dist/
+.DS_Store
+*.log
