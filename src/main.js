@@ -26,6 +26,7 @@ const places = [
     { name: "Punto 4", lat: 40.654259, lon: -4.697023 }
 ];
 
+/* TODO: BORRAR ESTA FUNCION - Solo es temporal para ayudar a encontrar los puntos durante las pruebas de campo */
 function getDistanceFromLatLonInM(lat1, lon1, lat2, lon2) {
     var R = 6371;
     var dLat = deg2rad(lat2 - lat1);
