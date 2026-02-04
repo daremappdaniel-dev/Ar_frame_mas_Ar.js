@@ -1,6 +1,6 @@
-# AR.frame y Ar.js MVP
+# A.frame, Ar.js-next y locar MVP
 
-Prototipo de navegación con Realidad Aumentada usando Ar.frame y Ar.js.
+Prototipo de navegación con Realidad Aumentada usando A.frame y Ar.js-next y locar.
 
 1.URL oficial:
 https://aframe.io/
