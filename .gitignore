@@ -18,3 +18,9 @@ coverage/
 *.zip
 *.tar.gz
 *.rar
+
+# Agent files
+.agent/
+
+# Reference documentation
+src/components/references/
