@@ -40,7 +40,7 @@ Los videos de demostración están disponibles en:
 
 ## FUNCIONAAA 🚀
 
-Demostrado se puede utiliza Ar.js-next combinada con locar para la geolocalización con renderizado de imagenes 2d o figuras 3d.
+Demostrado se puede utilizar locar para la geolocalización con renderizado de imagenes 2d o figuras 3d.
 
 Ejemplo de prueba creacion del renderizado en puntos fijados en el Array, esto demuestra que mercator funciona.
 
@@ -52,7 +52,7 @@ El servidor de gitpages no encontro la ruta de la foto o yo puse la ruta mal eso
 
 <img width="280" height="611" alt="figura" src="https://github.com/user-attachments/assets/56b6483f-fedc-44e8-bdae-d44364f94717" />
 
-Añadi el Método Haversine real en el repo nuevo y de casualidad con segui que me midiera la distancia entre yo y los puntos, esto demuestra que la brujula funciona y con una precision increible.
+Añadi el Método Haversine real en el repo nuevo y se puede ver la distancia entre yo y los puntos, esto demuestra que la brujula funciona y con una precision increible.
 
 <img width="277" height="607" alt="haversine" src="https://github.com/user-attachments/assets/036fa9c7-8d3f-4021-9bf6-5cbeaa3a8fa6" />
 
