@@ -48,7 +48,7 @@ const initAR = async () => {
     camera.position.z = 2;
 
     eventBus.on('ar:markerFound', ({ id, poseMatrix }) => {
-        console.log('[DareMapp] 🎉 ¡Marcador detectado! ID:', id);
+        console.log('[DareMapp] ¡Marcador detectado! ID:', id);
         cube.visible = true;
         document.body.style.border = '5px solid green';
     });
@@ -60,7 +60,7 @@ const initAR = async () => {
     });
 
     eventBus.on('ar:markerLost', ({ id }) => {
-        console.log('[DareMapp] ❌ Marcador perdido');
+        console.log('[DareMapp] Marcador perdido');
         cube.visible = false;
         document.body.style.border = 'none';
     });

@@ -30,7 +30,6 @@ AFRAME.registerSystem('place-marker', {
                 marker.onFar();
             }
 
-            // Ensure marker always faces camera
             marker.el.object3D.lookAt(camPos);
         });
     }
@@ -64,7 +63,6 @@ AFRAME.registerComponent('place-marker', {
     },
 
     onNear: function () {
-        // Only trigger if state changes
         if (!this.isNear) {
             this.el.setAttribute('scale', '15 15 15');
             this.el.setAttribute('visible', true);
@@ -73,9 +71,7 @@ AFRAME.registerComponent('place-marker', {
     },
 
     onFar: function () {
-        // Only trigger if state changes
         if (this.isNear) {
-            // FIX: Hide or shrink when far
             this.el.setAttribute('scale', '0 0 0');
             this.el.setAttribute('visible', false);
             this.isNear = false;
