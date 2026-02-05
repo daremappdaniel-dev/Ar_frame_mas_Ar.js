@@ -4,6 +4,7 @@ import 'locar-aframe';
 import 'aframe-look-at-component';
 import './components/poi-renderer.js';
 import './components/poi-manager.js';
+import './components/route-manager.js';
 
 const POIS_DATA = [
     { name: "Punto 1", lat: 40.654202, lon: -4.697044 },
@@ -23,33 +24,12 @@ window.onload = function () {
         if (poiManager) {
             poiManager.loadPois(POIS_DATA);
             console.log("POIs cargados en el sistema de gestion.");
-        } else {
-            console.warn("Sistema poi-manager no encontrado. Reintentando...");
-            setTimeout(() => {
-                const retryManager = scene.systems['poi-manager'];
-                if (retryManager) {
-                    retryManager.loadPois(POIS_DATA);
-                }
-            }, 1000);
+        }
+
+        const routeManager = scene.systems['route-manager'];
+        if (routeManager) {
+            console.log("Cargando ruta en Route Manager...");
+            routeManager.loadRoute(POIS_DATA);
         }
     });
-};
-
-window.simulateGPS = function (lat, lon) {
-    const scene = document.querySelector('a-scene');
-    const poiManager = scene?.systems['poi-manager'];
-
-    if (!poiManager) {
-        console.error('Sistema poi-manager no encontrado');
-        return;
-    }
-
-    poiManager.userPosition = {
-        latitude: lat,
-        longitude: lon
-    };
-    poiManager.updateSlidingWindow();
-
-    console.log(`GPS Simulado: Lat ${lat}, Lon ${lon}`);
-    console.log(`POIs cercanos: ${poiManager.nearbyPOIsBuffer.length}`);
 };

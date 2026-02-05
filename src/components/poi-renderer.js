@@ -16,17 +16,27 @@ AFRAME.registerComponent('poi-renderer', {
             shader: 'flat',
             transparent: true,
             side: 'double',
-            opacity: 0.9
+            opacity: 0
         });
         this.el.setAttribute('look-at', '[camera]');
+        this.el.setAttribute('animation__fade', {
+            property: 'material.opacity',
+            from: 0,
+            to: 1.0,
+            dur: 500,
+            startEvents: 'reveal',
+            easing: 'linear'
+        });
 
         this.currentModelUrl = '';
         this.textComponent = this.textEl.components.text;
     },
 
     updateDirect: function (title, distanceMeters, modelUrl, active, nextLat, nextLon, hasNext) {
-        this.el.object3D.visible = active;
-        if (!active) return;
+        if (!active) {
+            this.el.setAttribute('material', 'opacity', 0);
+            return;
+        }
 
         if (modelUrl !== this.currentModelUrl) {
             this.currentModelUrl = modelUrl;
@@ -38,22 +48,25 @@ AFRAME.registerComponent('poi-renderer', {
             } else {
                 this.el.removeAttribute('gltf-model');
                 this.el.setAttribute('geometry', 'primitive: plane; width: 1; height: 1');
-                this.el.setAttribute('material', {
+                const materialConfig = {
                     shader: 'flat',
-                    src: modelUrl,
                     transparent: true,
-                    side: 'double'
-                });
+                    side: 'double',
+                    opacity: 0
+                };
+
+                if (modelUrl) {
+                    materialConfig.src = modelUrl;
+                    materialConfig.color = '#FFFFFF';
+                } else {
+                    materialConfig.color = '#FFA500';
+                }
+
+                this.el.setAttribute('material', materialConfig);
             }
         }
 
-        const textObj = this.textEl.components.text;
-        if (textObj) {
-            textObj.data.value = `${title}\n${distanceMeters}m`;
-            textObj.update();
-        } else {
-            this.textEl.setAttribute('value', `${title}\n${distanceMeters}m`);
-        }
+        this.textEl.setAttribute('value', `${title}\n${distanceMeters}m`);
 
         if (hasNext) {
             const locarPlace = this.el.getAttribute('locar-entity-place');
@@ -69,6 +82,11 @@ AFRAME.registerComponent('poi-renderer', {
 
     deactivate: function () {
         this.el.object3D.visible = false;
+        this.el.setAttribute('material', 'opacity', 0);
+    },
+
+    reveal: function () {
+        this.el.emit('reveal');
     },
 
     update: function () {

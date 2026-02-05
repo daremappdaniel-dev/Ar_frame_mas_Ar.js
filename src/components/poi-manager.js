@@ -2,7 +2,8 @@ AFRAME.registerSystem('poi-manager', {
     schema: {
         poolSize: { type: 'number', default: 20 },
         windowRadius: { type: 'number', default: 500 },
-        defaultModel: { type: 'string', default: './assets/daremapp/flecha.png' }
+        proximityRadius: { type: 'number', default: 15 },
+        defaultModel: { type: 'string', default: '' }
     },
 
     init: function () {
@@ -43,14 +44,18 @@ AFRAME.registerSystem('poi-manager', {
             const el = document.createElement('a-entity');
 
             el.setAttribute('poi-renderer', { active: false });
-            el.setAttribute('scale', '15 15 15');
+            el.setAttribute('scale', '0 0 0');
+            el.setAttribute('position', '0 0 0');
+            el.setAttribute('material', { shader: 'flat', transparent: true, opacity: 0 });
             el.setAttribute('id', `poi-pool-${i}`);
+            el.object3D.visible = false;
 
             scene.appendChild(el);
             this.poolEntities.push(el);
         }
 
         this.isPoolCreated = true;
+        console.log('[POI-Manager] Pool de entidades listo.');
     },
 
     setupGpsListeners: function () {
@@ -141,36 +146,95 @@ AFRAME.registerSystem('poi-manager', {
     renderPool: function () {
         for (let i = 0; i < this.data.poolSize; i++) {
             const entity = this.poolEntities[i];
-            const renderer = entity.components['poi-renderer'];
+            const isActive = i < this.nearbyCount;
 
-            if (i < this.nearbyCount) {
+            if (isActive) {
+                this.activatePoolEntity(entity, i);
+
                 const idx = this.nearbyIndices[i];
-                const nextIdx = (i + 1 < this.nearbyCount) ? this.nearbyIndices[i + 1] : -1;
+                const distance = this.distances[idx];
 
-                entity.setAttribute('locar-entity-place', {
-                    latitude: this.latitudes[idx],
-                    longitude: this.longitudes[idx]
-                });
+                if (entity.getAttribute('scale').x > 0) {
+                    const isVisibleByProximity = distance <= this.data.proximityRadius;
+                    entity.object3D.visible = isVisibleByProximity;
 
-                if (renderer) {
-                    renderer.updateDirect(
-                        this.names[idx],
-                        Math.round(this.distances[idx]),
-                        this.models[idx] || this.data.defaultModel,
-                        true,
-                        nextIdx >= 0 ? this.latitudes[nextIdx] : 0,
-                        nextIdx >= 0 ? this.longitudes[nextIdx] : 0,
-                        nextIdx >= 0
-                    );
                 }
 
             } else {
-                if (renderer) {
-                    renderer.deactivate();
-                }
-                entity.removeAttribute('locar-entity-place');
+                this.deactivatePoolEntity(entity);
             }
         }
+    },
+
+    activatePoolEntity: function (entity, poolIndex) {
+        console.log(`[POI-Manager] ACTIVANDO POI Slot ${poolIndex}`);
+        const idx = this.nearbyIndices[poolIndex];
+        const nextIdx = this.getNextPoiIndex(poolIndex);
+
+        entity.setAttribute('scale', '0 0 0');
+        entity.object3D.visible = true;
+        console.log(`[POI-Manager] POI Slot ${poolIndex}: Visible=true (Logico), pero Escala=0`);
+
+        const renderer = entity.components['poi-renderer'];
+        if (renderer) {
+            const name = this.names[idx];
+            console.log(`[POI-Manager] POI Slot ${poolIndex}: Asignando nombre "${name}"`);
+            const dist = Math.round(this.distances[idx]);
+            const model = this.models[idx] || this.data.defaultModel;
+            const hasNext = nextIdx >= 0;
+            const nLat = hasNext ? this.latitudes[nextIdx] : 0;
+            const nLon = hasNext ? this.longitudes[nextIdx] : 0;
+
+            renderer.updateDirect(name, dist, model, true, nLat, nLon, hasNext);
+        }
+
+        entity.setAttribute('locar-entity-place', {
+            latitude: this.latitudes[idx],
+            longitude: this.longitudes[idx]
+        });
+
+        entity.addEventListener('object-placed', () => {
+            console.log(`[POI-Manager] EVENTO: object-placed recibido para Slot ${poolIndex}`);
+            setTimeout(() => {
+                if (entity.getAttribute('locar-entity-place')) {
+                    entity.setAttribute('scale', '15 15 15');
+                    entity.setAttribute('material', 'opacity', 1);
+
+                    const distCheck = entity.components['poi-renderer']?.dist || 9999;
+                    const isVisibleByProximity = distCheck <= this.data.proximityRadius;
+
+                    if (isVisibleByProximity) {
+                        console.log(`[POI-Manager] POI Slot ${poolIndex}: MOSTRANDO (Big Bang + Proximidad OK)`);
+                        if (renderer) {
+                            renderer.el.object3D.visible = true;
+                            renderer.reveal();
+                        }
+                    } else {
+                        console.log(`[POI-Manager] POI Slot ${poolIndex}: ACTIVO pero LEJOS (${distCheck}m > ${this.data.proximityRadius}m). Invisible.`);
+                        entity.object3D.visible = false;
+                    }
+
+                } else {
+                    console.warn(`[POI-Manager] POI Slot ${poolIndex}: Cancelado (ya no es activo)`);
+                }
+            }, 500);
+        }, { once: true });
+    },
+
+    deactivatePoolEntity: function (entity) {
+        const renderer = entity.components['poi-renderer'];
+        if (renderer) {
+            renderer.deactivate();
+        }
+        entity.setAttribute('scale', '0 0 0');
+        entity.setAttribute('material', 'opacity', 0);
+        entity.setAttribute('position', '0 0 0');
+        entity.removeAttribute('locar-entity-place');
+    },
+
+    getNextPoiIndex: function (poolIndex) {
+        const nextPoolIndex = poolIndex + 1;
+        return nextPoolIndex < this.nearbyCount ? this.nearbyIndices[nextPoolIndex] : -1;
     },
 
     haversine: function (lat1, lon1, lat2, lon2) {
@@ -180,6 +244,8 @@ AFRAME.registerSystem('poi-manager', {
         const dLon = toRad(lon2 - lon1);
         const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
             Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(toRad(lat1)) * Math.cos(toRad(lat2));
-        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        console.log(`[GPS-Debug] Distancia calculada: ${dist.toFixed(2)}m`);
+        return dist;
     }
 });

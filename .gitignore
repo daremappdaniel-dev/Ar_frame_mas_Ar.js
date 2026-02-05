@@ -23,4 +23,5 @@ coverage/
 .agent/
 
 # Reference documentation
-src/components/references/
+src/references/
+NFT-Marker-Creator/

@@ -9,9 +9,11 @@
 </head>
 
 <body style="margin: 0; overflow: hidden;">
-    <a-scene locar-webcam poi-manager="poolSize: 20; windowRadius: 500">
+    <!-- El script se carga via modulo en main.js -->
+
+    <a-scene locar-webcam poi-manager="poolSize: 20; windowRadius: 500" route-manager>
         <a-assets>
-            <img id="flecha-asset" src="./assets/daremapp/flecha.png" alt="Flecha direccional">
+            <!-- Assets eliminados -->
         </a-assets>
         <a-camera look-controls="magicWindowTrackingEnabled: false" wasd-controls locar-camera>
         </a-camera>
