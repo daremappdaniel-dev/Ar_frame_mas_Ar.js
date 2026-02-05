@@ -1,7 +1,6 @@
 import './components/poi-renderer.js';
 import './components/poi-manager.js';
 import './components/route-manager.js';
-import './components/nft-handler.js';
 
 const POIS_DATA = [
     { name: "Punto 1: Inicio", lat: 40.654613, lon: -4.701812, model: "./assets/daremapp/marcador.png" },
