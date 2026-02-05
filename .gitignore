@@ -18,3 +18,15 @@ coverage/
 *.zip
 *.tar.gz
 *.rar
+
+# Agent files
+.agent/
+
+# Reference documentation
+src/references/
+NFT-Marker-Creator/
+
+# Heavy Assets & Local Libraries
+public/js/
+public/markers/*.png
+*.png
