@@ -20,6 +20,9 @@ AFRAME.registerSystem('poi-manager', {
         this.distBuffer = null;
         this.indicesBuffer = null;
 
+        this.retries = 0;
+        this.maxRetries = 10;
+
         console.log('[POI-Manager] Sistema iniciado.');
 
         const scene = this.el;
@@ -113,19 +116,31 @@ AFRAME.registerSystem('poi-manager', {
         const locarCameraEl = document.querySelector('[locar-camera]');
 
         if (!locarCameraEl) {
-            console.warn('[POI-Manager] Waiting for locar-camera...');
+            this.retries++;
+            if (this.retries >= this.maxRetries) {
+                console.error('[POI-Manager] ❌ ABORTADO: locar-camera no encontrada tras ' + this.maxRetries + ' intentos.');
+                console.error('[POI-Manager] 💡 Asegúrate de que la entidad cámara tenga el atributo "locar-camera".');
+                return;
+            }
+            console.warn(`[POI-Manager] Waiting for locar-camera... (${this.retries}/${this.maxRetries})`);
             setTimeout(() => this.setupLocARListeners(), 1000);
             return;
         }
 
         const component = locarCameraEl.components['locar-camera'];
         if (!component?.locar) {
-            console.warn('[POI-Manager] LocAR not ready, retrying...');
+            this.retries++;
+            if (this.retries >= this.maxRetries) {
+                console.error('[POI-Manager] ❌ ABORTADO: LocAR no se inicializó tras ' + this.maxRetries + ' intentos.');
+                return;
+            }
+            console.warn(`[POI-Manager] LocAR not ready, retrying... (${this.retries}/${this.maxRetries})`);
             setTimeout(() => this.setupLocARListeners(), 500);
             return;
         }
 
-        console.log('[POI-Manager] GPS/LocAR conectado.');
+        this.retries = 0;
+        console.log('[POI-Manager] ✅ GPS/LocAR conectado correctamente.');
 
         locarCameraEl.addEventListener('gpsupdate', (e) => {
             if (e.detail?.position?.coords) {
@@ -161,9 +176,14 @@ AFRAME.registerSystem('poi-manager', {
             const inWindow = i < this.totalPois && distance <= this.data.windowRadius;
             const tooClose = distance < this.data.proximityRadius;
 
-            if (inWindow && !tooClose) {
-                console.log(`[Field-Test] POI: ${this.names[dataIndex]} | Distancia: ${Math.round(distance)}m`);
-                this.activatePoolEntity(entity, dataIndex, distance);
+            if (inWindow) {
+                if (!tooClose) {
+                    console.log(`[Field-Test] ✅ MOSTRANDO: ${this.names[dataIndex]} | Distancia: ${Math.round(distance)}m`);
+                    this.activatePoolEntity(entity, dataIndex, distance);
+                } else {
+                    console.log(`[Field-Test] 🙈 OCULTO (Muy cerca): ${this.names[dataIndex]} | Distancia: ${Math.round(distance)}m (< ${this.data.proximityRadius}m)`);
+                    this.deactivatePoolEntity(entity);
+                }
             } else {
                 this.deactivatePoolEntity(entity);
             }
@@ -186,15 +206,15 @@ AFRAME.registerSystem('poi-manager', {
             renderer.updateDirect(name, Math.round(distance), model, true);
         }
 
-        if (!entity.object3D.visible) {
+        if (entity.object3D.visible) {
+            entity.setAttribute('scale', '1 1 1');
+        } else {
             setTimeout(() => {
                 if (entity.getAttribute('poi-renderer').active) {
                     entity.setAttribute('visible', true);
                     entity.setAttribute('scale', '1 1 1');
                 }
             }, 100);
-        } else {
-            entity.setAttribute('scale', '1 1 1');
         }
     },
 
