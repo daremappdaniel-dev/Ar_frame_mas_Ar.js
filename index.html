@@ -6,30 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>DareMapp AR - LocAR & PoI</title>
     <link rel="stylesheet" href="./style.css">
-
-    <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-    <script src="https://unpkg.com/aframe-look-at-component@0.8.0/dist/aframe-look-at-component.min.js"></script>
-
-    <script src="https://ukchill.github.io/locar.js/dist/locar.js"></script>
-    <script src="https://ukchill.github.io/locar.js/dist/locar-aframe.js"></script>
-
+    <script type="module" src="./src/main.js"></script>
     <script src="//cdn.jsdelivr.net/npm/eruda"></script>
 </head>
 
 <body style="margin: 0; overflow: hidden;">
 
     <a-scene embedded vr-mode-ui="enabled: false;" renderer="logarithmicDepthBuffer: true; precision: medium;"
-        poi-manager="poolSize: 20; windowRadius: 500; proximityRadius: 11" route-manager>
+        poi-manager="poolSize: 20; windowRadius: 500; proximityRadius: 11" route-manager locar-webcam>
 
         <a-assets>
-            <img id="marcador-logo" src="./assets/daremapp/marcador.png">
+            <img id="marcador-logo" src="/assets/marcador.png" alt="DareMapp POI marker icon">
         </a-assets>
 
-        <a-entity camera locar-camera="gpsMinDistance: 5"></a-entity>
+        <a-entity camera locar-camera></a-entity>
 
     </a-scene>
 
-    <script type="module" src="./src/main.js"></script>
     <script>eruda.init();</script>
 </body>
 
