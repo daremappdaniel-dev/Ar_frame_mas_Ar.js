@@ -22,7 +22,7 @@ AFRAME.registerComponent('poi-renderer', {
         this.el.setAttribute('animation__fade', {
             property: 'material.opacity',
             from: 0,
-            to: 1.0,
+            to: 1,
             dur: 500,
             startEvents: 'reveal',
             easing: 'linear'
@@ -39,45 +39,51 @@ AFRAME.registerComponent('poi-renderer', {
         }
 
         if (modelUrl !== this.currentModelUrl) {
-            this.currentModelUrl = modelUrl;
-
-            if (modelUrl.toLowerCase().endsWith('.glb') || modelUrl.toLowerCase().endsWith('.gltf')) {
-                this.el.setAttribute('gltf-model', modelUrl);
-                this.el.removeAttribute('geometry');
-                this.el.removeAttribute('material');
-            } else {
-                this.el.removeAttribute('gltf-model');
-                this.el.setAttribute('geometry', 'primitive: plane; width: 1; height: 1');
-                const materialConfig = {
-                    shader: 'flat',
-                    transparent: true,
-                    side: 'double',
-                    opacity: 0
-                };
-
-                if (modelUrl) {
-                    materialConfig.src = modelUrl;
-                    materialConfig.color = '#FFFFFF';
-                } else {
-                    materialConfig.color = '#FFA500';
-                }
-
-                this.el.setAttribute('material', materialConfig);
-            }
+            this.updateModel(modelUrl);
         }
 
         this.textEl.setAttribute('value', `${title}\n${distanceMeters}m`);
 
         if (hasNext) {
-            const locarPlace = this.el.getAttribute('locar-entity-place');
-            if (locarPlace) {
-                const bearing = this.calculateBearing(
-                    locarPlace.latitude, locarPlace.longitude,
-                    nextLat, nextLon
-                );
-                this.el.object3D.rotation.y = THREE.MathUtils.degToRad(-bearing);
-            }
+            this.updateBearing(nextLat, nextLon);
         }
+    },
+
+    updateModel: function (modelUrl) {
+        this.currentModelUrl = modelUrl;
+
+        if (modelUrl && (modelUrl.toLowerCase().endsWith('.glb') || modelUrl.toLowerCase().endsWith('.gltf'))) {
+            this.el.setAttribute('gltf-model', modelUrl);
+            this.el.removeAttribute('geometry');
+            this.el.removeAttribute('material');
+            return;
+        }
+
+        this.el.removeAttribute('gltf-model');
+        this.el.setAttribute('geometry', 'primitive: plane; width: 1; height: 1');
+
+        const materialConfig = {
+            shader: 'flat',
+            transparent: true,
+            side: 'double',
+            opacity: 0,
+            color: modelUrl ? '#FFFFFF' : '#FFA500'
+        };
+
+        if (modelUrl) materialConfig.src = modelUrl;
+
+        this.el.setAttribute('material', materialConfig);
+    },
+
+    updateBearing: function (nextLat, nextLon) {
+        const locarPlace = this.el.getAttribute('locar-entity-place');
+        if (!locarPlace) return;
+
+        const bearing = this.calculateBearing(
+            locarPlace.latitude, locarPlace.longitude,
+            nextLat, nextLon
+        );
+        this.el.object3D.rotation.y = THREE.MathUtils.degToRad(-bearing);
     },
 
     deactivate: function () {

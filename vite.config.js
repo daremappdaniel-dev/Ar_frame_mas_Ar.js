@@ -1,18 +1,28 @@
-import path from 'path';
 import { defineConfig } from 'vite';
+import mkcert from 'vite-plugin-mkcert';
 
 export default defineConfig({
-  base: '/Ar_frame_mas_Ar.js/',
-  resolve: {
-    alias: {
-      'three': path.resolve(__dirname, 'node_modules/three')
-    }
-  },
+  base: './',
+
   server: {
+    https: true,
     host: true,
     port: 5173
   },
+
+  plugins: [
+    mkcert()
+  ],
+
   build: {
-    outDir: 'dist',
+    target: 'esnext'
+  },
+
+  optimizeDeps: {
+    include: [
+      'three',
+      '@ar-js-org/arjs-plugin-artoolkit',
+      '@ar-js-org/arjs-plugin-threejs'
+    ]
   }
 });

@@ -13,10 +13,14 @@ AFRAME.registerSystem('route-manager', {
     },
 
     loadRoute: function (gpsCoordinates) {
-
         const locarCamera = document.querySelector('[locar-camera]');
+
         if (!locarCamera || !locarCamera.components['locar-camera']?.locar) {
-            console.log('[Route-Manager] Esperando a LocAR...');
+            this.retryCount = (this.retryCount || 0) + 1;
+            if (this.retryCount > 10) {
+                console.warn('[Route-Manager] ABORTADO: No se encontró locar-camera tras 10 intentos.');
+                return;
+            }
             setTimeout(() => this.loadRoute(gpsCoordinates), 500);
             return;
         }
@@ -25,19 +29,17 @@ AFRAME.registerSystem('route-manager', {
 
         this.pathPoints = gpsCoordinates.map(coord => {
             const dummy = document.createElement('a-entity');
-            dummy.setAttribute('gps-projected-entity-place', {
+            dummy.setAttribute('locar-entity-place', {
                 latitude: coord.lat,
                 longitude: coord.lon
             });
             return this.projectGPS(locar, coord.lat, coord.lon);
         });
 
-
         this.createPathMesh();
     },
 
     projectGPS: function (locar, lat, lon) {
-
         if (!this.routeOrigin) {
             this.routeOrigin = { lat: lat, lon: lon };
             return new THREE.Vector3(0, 0, 0);
@@ -54,8 +56,6 @@ AFRAME.registerSystem('route-manager', {
         return new THREE.Vector3(x, 0, z);
     },
 
-
-
     createPathMesh: function () {
         if (!this.pathPoints || this.pathPoints.length < 2) return;
 
@@ -66,7 +66,6 @@ AFRAME.registerSystem('route-manager', {
         const curve = new THREE.CatmullRomCurve3(this.pathPoints);
         curve.curveType = 'centripetal';
         curve.tension = 0.5;
-
 
         const geometry = new THREE.TubeGeometry(curve, this.pathPoints.length * 15, 1.5, 8, false);
 
@@ -83,7 +82,7 @@ AFRAME.registerSystem('route-manager', {
         const routeAnchor = document.createElement('a-entity');
 
         if (this.routeOrigin) {
-            routeAnchor.setAttribute('gps-projected-entity-place', {
+            routeAnchor.setAttribute('locar-entity-place', {
                 latitude: this.routeOrigin.lat,
                 longitude: this.routeOrigin.lon
             });

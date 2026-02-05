@@ -14,7 +14,11 @@ AFRAME.registerSystem('place-marker', {
     },
 
     tick: function () {
-        if (!this.cameraEl) return;
+        if (!this.cameraEl) {
+            this.cameraEl = document.querySelector('[locar-camera]');
+            return;
+        }
+
         const camPos = this.cameraEl.object3D.position;
 
         this.markers.forEach(marker => {
@@ -26,6 +30,7 @@ AFRAME.registerSystem('place-marker', {
                 marker.onFar();
             }
 
+            // Ensure marker always faces camera
             marker.el.object3D.lookAt(camPos);
         });
     }
@@ -41,13 +46,13 @@ AFRAME.registerComponent('place-marker', {
         const el = this.el;
         const modelUrl = this.data.model;
 
-        if (modelUrl.toLowerCase().endsWith('.glb') || modelUrl.toLowerCase().endsWith('.gltf')) {
+        if (modelUrl && (modelUrl.toLowerCase().endsWith('.glb') || modelUrl.toLowerCase().endsWith('.gltf'))) {
             el.setAttribute('gltf-model', modelUrl);
         } else {
             el.setAttribute('geometry', 'primitive: plane; width: 1; height: 1');
             el.setAttribute('material', {
                 shader: 'flat',
-                src: modelUrl,
+                src: modelUrl || '',
                 transparent: true,
                 side: 'double'
             });
@@ -59,15 +64,20 @@ AFRAME.registerComponent('place-marker', {
     },
 
     onNear: function () {
+        // Only trigger if state changes
         if (!this.isNear) {
             this.el.setAttribute('scale', '15 15 15');
+            this.el.setAttribute('visible', true);
             this.isNear = true;
         }
     },
 
     onFar: function () {
+        // Only trigger if state changes
         if (this.isNear) {
-            this.el.setAttribute('scale', '15 15 15');
+            // FIX: Hide or shrink when far
+            this.el.setAttribute('scale', '0 0 0');
+            this.el.setAttribute('visible', false);
             this.isNear = false;
         }
     },
