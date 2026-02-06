@@ -1,3 +1,5 @@
+import { GeoUtils } from '../utils/geo-utils.js';
+
 AFRAME.registerSystem('poi-manager', {
     schema: {
         poolSize: { type: 'number', default: 20 },
@@ -12,6 +14,7 @@ AFRAME.registerSystem('poi-manager', {
         this.longitudes = null;
         this.names = [];
         this.models = [];
+        this.firstFix = false;
 
         this.poolEntities = [];
         this.userPosition = null;
@@ -144,7 +147,15 @@ AFRAME.registerSystem('poi-manager', {
 
         locarCameraEl.addEventListener('gpsupdate', (e) => {
             if (e.detail?.position?.coords) {
-                const { latitude, longitude } = e.detail.position.coords;
+                const { latitude, longitude, accuracy } = e.detail.position.coords;
+
+                if (!this.firstFix) {
+                    console.log(`[GPS-FIX] 🎯 ¡Te encontré!`);
+                    console.log(`[GPS-FIX] 📍 Lat: ${latitude.toFixed(6)}, Lon: ${longitude.toFixed(6)}`);
+                    console.log(`[GPS-FIX] 📏 Precisión: ${Math.round(accuracy)} metros`);
+                    this.firstFix = true;
+                }
+
                 this.userPosition = { latitude, longitude };
                 this.updateSlidingWindow();
             }
@@ -158,7 +169,7 @@ AFRAME.registerSystem('poi-manager', {
         const userLon = this.userPosition.longitude;
 
         for (let i = 0; i < this.totalPois; i++) {
-            this.distBuffer[i] = this.haversine(userLat, userLon, this.latitudes[i], this.longitudes[i]);
+            this.distBuffer[i] = GeoUtils.haversine(userLat, userLon, this.latitudes[i], this.longitudes[i]);
             this.indicesBuffer[i] = i;
         }
 
@@ -224,17 +235,5 @@ AFRAME.registerSystem('poi-manager', {
         entity.setAttribute('scale', '0 0 0');
         entity.setAttribute('position', '0 -10000 0');
         entity.removeAttribute('locar-entity-place');
-    },
-
-    haversine: function (lat1, lon1, lat2, lon2) {
-        const R = 6371e3;
-        const toRad = x => x * Math.PI / 180;
-        const dLat = toRad(lat2 - lat1);
-        const dLon = toRad(lon2 - lon1);
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-            Math.sin(dLon / 2) * Math.sin(dLon / 2);
-        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        return R * c;
     }
 });
