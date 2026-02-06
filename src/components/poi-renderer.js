@@ -31,10 +31,9 @@ AFRAME.registerComponent('poi-renderer', {
         });
 
         this.currentModelUrl = '';
-        this.textComponent = this.textEl.components.text;
     },
 
-    updateDirect: function (title, distanceMeters, modelUrl, active, nextLat, nextLon, hasNext) {
+    updateDirect: function (title, distanceMeters, modelUrl, active) {
         if (!active) {
             this.el.setAttribute('material', 'opacity', 0);
             return;
@@ -45,10 +44,6 @@ AFRAME.registerComponent('poi-renderer', {
         }
 
         this.textEl.setAttribute('value', `${title}\n${distanceMeters}m`);
-
-        if (hasNext) {
-            this.updateBearing(nextLat, nextLon);
-        }
     },
 
     updateModel: function (modelUrl) {
