@@ -1,3 +1,5 @@
+import { GeoUtils } from '../utils/geo_utils.js';
+
 AFRAME.registerSystem('poi-manager', {
     schema: {
         poolSize: { type: 'number', default: 20 },
@@ -129,7 +131,7 @@ AFRAME.registerSystem('poi-manager', {
         const radius = this.data.windowRadius;
 
         for (let i = 0; i < this.poisCount; i++) {
-            const distance = this.haversine(userLat, userLon, this.latitudes[i], this.longitudes[i]);
+            const distance = GeoUtils.haversine(userLat, userLon, this.latitudes[i], this.longitudes[i]);
             this.distances[i] = distance;
 
             if (distance <= radius) {
@@ -235,17 +237,5 @@ AFRAME.registerSystem('poi-manager', {
     getNextPoiIndex: function (poolIndex) {
         const nextPoolIndex = poolIndex + 1;
         return nextPoolIndex < this.nearbyCount ? this.nearbyIndices[nextPoolIndex] : -1;
-    },
-
-    haversine: function (lat1, lon1, lat2, lon2) {
-        const R = 6371e3;
-        const toRad = x => x * Math.PI / 180;
-        const dLat = toRad(lat2 - lat1);
-        const dLon = toRad(lon2 - lon1);
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-            Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(toRad(lat1)) * Math.cos(toRad(lat2));
-        const dist = R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-        console.log(`[GPS-Debug] Distancia calculada: ${dist.toFixed(2)}m`);
-        return dist;
     }
 });

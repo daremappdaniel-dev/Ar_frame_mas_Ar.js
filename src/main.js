@@ -3,15 +3,12 @@ import 'locar';
 import 'locar-aframe';
 import 'aframe-look-at-component';
 import './components/poi-renderer.js';
-import './components/poi-manager.js';
-import './components/route-manager.js';
-
-const POIS_DATA = [
-    { name: "Punto 1", lat: 40.654202, lon: -4.697044 },
-    { name: "Punto 2", lat: 40.654132, lon: -4.697073 },
-    { name: "Punto 3", lat: 40.654071, lon: -4.697097 },
-    { name: "Punto 4", lat: 40.654259, lon: -4.697023 }
-];
+import './components/place-marker.js';
+import './components/hybrid-marker-adapter.js';
+import './system/poi-manager.js';
+import './system/route-manager.js';
+import './system/hybrid-marker-manager.js';
+import { poisData } from './data/pois-data.js';
 
 window.onload = function () {
     console.log("Iniciando aplicacion AR con arquitectura ECS...");
@@ -22,14 +19,14 @@ window.onload = function () {
 
         const poiManager = scene.systems['poi-manager'];
         if (poiManager) {
-            poiManager.loadPois(POIS_DATA);
+            poiManager.loadPois(poisData);
             console.log("POIs cargados en el sistema de gestion.");
         }
 
         const routeManager = scene.systems['route-manager'];
         if (routeManager) {
             console.log("Cargando ruta en Route Manager...");
-            routeManager.loadRoute(POIS_DATA);
+            routeManager.loadRoute(poisData);
         }
     });
 };
