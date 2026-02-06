@@ -1,3 +1,5 @@
+import { GeoUtils } from '../utils/geo-utils.js';
+
 AFRAME.registerComponent('poi-renderer', {
     schema: {
         active: { type: 'boolean', default: false }
@@ -79,7 +81,7 @@ AFRAME.registerComponent('poi-renderer', {
         const locarPlace = this.el.getAttribute('locar-entity-place');
         if (!locarPlace) return;
 
-        const bearing = this.calculateBearing(
+        const bearing = GeoUtils.calculateBearing(
             locarPlace.latitude, locarPlace.longitude,
             nextLat, nextLon
         );
@@ -99,17 +101,5 @@ AFRAME.registerComponent('poi-renderer', {
         if (!this.data.active) {
             this.el.object3D.visible = false;
         }
-    },
-
-    calculateBearing: function (lat1, lon1, lat2, lon2) {
-        const toRad = x => x * Math.PI / 180;
-        const toDeg = x => x * 180 / Math.PI;
-
-        const dLon = toRad(lon2 - lon1);
-        const y = Math.sin(dLon) * Math.cos(toRad(lat2));
-        const x = Math.cos(toRad(lat1)) * Math.sin(toRad(lat2)) -
-            Math.sin(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.cos(dLon);
-
-        return (toDeg(Math.atan2(y, x)) + 360) % 360;
     }
 });
