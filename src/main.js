@@ -1,4 +1,6 @@
+
 import 'aframe';
+import 'aframe-look-at-component';
 import 'locar';
 import 'locar-aframe';
 import 'aframe-look-at-component';
