@@ -121,8 +121,8 @@ AFRAME.registerSystem('poi-manager', {
         if (!locarCameraEl) {
             this.retries++;
             if (this.retries >= this.maxRetries) {
-                console.error('[POI-Manager] ❌ ABORTADO: locar-camera no encontrada tras ' + this.maxRetries + ' intentos.');
-                console.error('[POI-Manager] 💡 Asegúrate de que la entidad cámara tenga el atributo "locar-camera".');
+                console.error('[POI-Manager] ABORTADO: locar-camera no encontrada tras ' + this.maxRetries + ' intentos.');
+                console.error('[POI-Manager] Asegúrate de que la entidad cámara tenga el atributo "locar-camera".');
                 return;
             }
             console.warn(`[POI-Manager] Waiting for locar-camera... (${this.retries}/${this.maxRetries})`);
@@ -134,7 +134,7 @@ AFRAME.registerSystem('poi-manager', {
         if (!component?.locar) {
             this.retries++;
             if (this.retries >= this.maxRetries) {
-                console.error('[POI-Manager] ❌ ABORTADO: LocAR no se inicializó tras ' + this.maxRetries + ' intentos.');
+                console.error('[POI-Manager] ABORTADO: LocAR no se inicializó tras ' + this.maxRetries + ' intentos.');
                 return;
             }
             console.warn(`[POI-Manager] LocAR not ready, retrying... (${this.retries}/${this.maxRetries})`);
@@ -143,16 +143,16 @@ AFRAME.registerSystem('poi-manager', {
         }
 
         this.retries = 0;
-        console.log('[POI-Manager] ✅ GPS/LocAR conectado correctamente.');
+        console.log('[POI-Manager] GPS/LocAR conectado correctamente.');
 
         locarCameraEl.addEventListener('gpsupdate', (e) => {
             if (e.detail?.position?.coords) {
                 const { latitude, longitude, accuracy } = e.detail.position.coords;
 
                 if (!this.firstFix) {
-                    console.log(`[GPS-FIX] 🎯 ¡Te encontré!`);
-                    console.log(`[GPS-FIX] 📍 Lat: ${latitude.toFixed(6)}, Lon: ${longitude.toFixed(6)}`);
-                    console.log(`[GPS-FIX] 📏 Precisión: ${Math.round(accuracy)} metros`);
+                    console.log(`[GPS-FIX] ¡Te encontré!`);
+                    console.log(`[GPS-FIX] Lat: ${latitude.toFixed(6)}, Lon: ${longitude.toFixed(6)}`);
+                    console.log(`[GPS-FIX] Precisión: ${Math.round(accuracy)} metros`);
                     this.firstFix = true;
                 }
 
@@ -189,10 +189,10 @@ AFRAME.registerSystem('poi-manager', {
 
             if (inWindow) {
                 if (!tooClose) {
-                    console.log(`[Field-Test] ✅ MOSTRANDO: ${this.names[dataIndex]} | Distancia: ${Math.round(distance)}m`);
+                    console.log(`[Field-Test] MOSTRANDO: ${this.names[dataIndex]} | Distancia: ${Math.round(distance)}m`);
                     this.activatePoolEntity(entity, dataIndex, distance);
                 } else {
-                    console.log(`[Field-Test] 🙈 OCULTO (Muy cerca): ${this.names[dataIndex]} | Distancia: ${Math.round(distance)}m (< ${this.data.proximityRadius}m)`);
+                    console.log(`[Field-Test] OCULTO (Muy cerca): ${this.names[dataIndex]} | Distancia: ${Math.round(distance)}m (< ${this.data.proximityRadius}m)`);
                     this.deactivatePoolEntity(entity);
                 }
             } else {
